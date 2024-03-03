@@ -87,13 +87,13 @@ def key_for_max_value(target_dict):
 
 
 def count_replies(messages: list):
-    replies = []
+    replies = set()
     user_message_replies = {}
 
     for message in messages:
+        user_message_replies[message['sent_by']] = 0
         if message['reply_for']:
-            replies.append(message['reply_for'])
-            user_message_replies[message['sent_by']] = 0
+            replies.add(message['reply_for'])
 
     for message in messages:
         if message['id'] in replies:
