@@ -114,10 +114,13 @@ def count_gender(students: list, is_male: dict) -> dict:
         'мальчики': 0,
     }
     for name in students:
-        if is_male[name['first_name']]:
-            count_genders['мальчики'] += 1
+        if name['first_name'] in is_male:
+            if is_male.get(name['first_name']):
+                count_genders['мальчики'] += 1
+            else:
+                count_genders['девочки'] += 1
         else:
-            count_genders['девочки'] += 1
+            print(f"Имя {name['first_name']} не найдено в словаре")
     return count_genders
 
 

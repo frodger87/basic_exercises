@@ -30,9 +30,9 @@ messages = [
 
 Весь код стоит разбить на логические части с помощью функций.
 """
+import datetime
 import random
 import uuid
-import datetime
 
 import lorem
 
@@ -66,5 +66,49 @@ def generate_chat_history():
     return messages
 
 
+def count_values(messages: list, target_field: str) -> dict:
+    count_values = {}
+    for message in messages:
+        if message[target_field] not in count_values:
+            count_values[message[target_field]] = 1
+        else:
+            count_values[message[target_field]] += 1
+    return count_values
+
+
+def key_for_max_value(target_dict):
+    target_key = ''
+    max_value = 0
+    for key, value in target_dict.items():
+        if target_dict[key] > max_value:
+            target_key = key
+            max_value = target_dict[key]
+    return target_key
+
+
+def count_replies(messages: list):
+    replies = []
+    user_message_replies = {}
+
+    for message in messages:
+        if message['reply_for']:
+            replies.append(message['reply_for'])
+            user_message_replies[message['sent_by']] = 0
+
+    for message in messages:
+        if message['id'] in replies:
+            user_message_replies[message['sent_by']] += 1
+
+    return user_message_replies
+
+
+print()
+
 if __name__ == "__main__":
-    print(generate_chat_history())
+    chat_history = generate_chat_history()
+    # print(generate_chat_history())
+    user_count_messages = count_values(chat_history, 'sent_by')
+    print(
+        f'Наибольшее число сообщений у пользователя id = {key_for_max_value(user_count_messages)}')
+    print(
+        f'Наибольшее число ответов на сообщение пользователя id = {key_for_max_value(count_replies(chat_history))}')
