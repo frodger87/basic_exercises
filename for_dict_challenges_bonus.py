@@ -37,7 +37,7 @@ import uuid
 import lorem
 
 
-def generate_chat_history():
+def generate_chat_history() -> list:
     messages_amount = random.randint(200, 1000)
     users_ids = list(
         {random.randint(1, 10000) for _ in range(random.randint(5, 20))}
@@ -76,17 +76,12 @@ def count_values(messages: list, target_field: str) -> dict:
     return count_values
 
 
-def key_for_max_value(target_dict):
-    target_key = ''
-    max_value = 0
-    for key, value in target_dict.items():
-        if target_dict[key] > max_value:
-            target_key = key
-            max_value = target_dict[key]
-    return target_key
+def keys_for_max_values(target_dict: dict) -> list:
+    max_value = max(target_dict.values())
+    return [str(key) for key in target_dict if target_dict[key] == max_value]
 
 
-def count_replies(messages: list):
+def count_replies(messages: list) -> dict:
     replies = set()
     user_message_replies = {}
 
@@ -104,11 +99,38 @@ def count_replies(messages: list):
 
 print()
 
+messages = generate_chat_history()
+
+
+def count_unique_users_seen(messages: list) -> dict:
+    users_seen_messages = {}
+    for message in messages:
+        if message['sent_by'] not in users_seen_messages:
+            users_seen_messages[message['sent_by']] = []
+
+    for message in messages:
+        users_seen_messages[message['sent_by']] += message['seen_by']
+
+    count_users_seen_messages = {}
+    for k, v in users_seen_messages.items():
+        count_users_seen_messages[k] = len(set(v))
+
+    return count_users_seen_messages
+
+
 if __name__ == "__main__":
     chat_history = generate_chat_history()
     # print(generate_chat_history())
-    user_count_messages = count_values(chat_history, 'sent_by')
-    print(
-        f'Наибольшее число сообщений у пользователя id = {key_for_max_value(user_count_messages)}')
-    print(
-        f'Наибольшее число ответов на сообщение пользователя id = {key_for_max_value(count_replies(chat_history))}')
+    if len(chat_history) > 0:
+        user_count_messages = count_values(chat_history, 'sent_by')
+        print(
+            f'Наибольшее число сообщений у: '
+            f'{", ".join(keys_for_max_values(user_count_messages))}')
+        print(
+            f'Пользователи, на сообщения которых больше всего отвечали: '
+            f'{", ".join(keys_for_max_values(count_replies(chat_history)))}')
+        print(
+            f'Пользователи сообщения которых видело больше всего уникальных пользователей: '
+            f'{", ".join(keys_for_max_values(count_unique_users_seen(chat_history)))}')
+    else:
+        print('В списке нет сообщений.')
